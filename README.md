@@ -13,6 +13,57 @@ decisions, progress, and blockers without losing the thread of the conversation.
 This is a prototype targeting **OpenCode V2**, developed against the published
 `@opencode/plugin` **2.2.0**. The desktop GUI plugin API is experimental. V1 is not supported.
 
+## Installation status
+
+**For this repository today, use the [clone/build/local-path instructions](#install-on-another-machine)
+below.** They are the development installation used for this prototype.
+
+OpenCode has a native plugin installer, but this repository is **not yet packaged
+for a complete one-command Git installation**: the desktop panel needs
+`dist/gui-experimental.cjs`, which is generated locally and excluded from Git.
+There is no install/build lifecycle hook configured to produce it during package
+installation, and that installation path has not been verified.
+
+There is also **no `install.sh` yet**. A single-script installer and a prebuilt,
+directly installable package are proposed improvements, not features already shipped.
+
+### How OpenCode plugins are normally installed
+
+OpenCode V2 can install and register global package plugins with its CLI:
+
+```sh
+# Examples for installable packages, not this repository's current checkout:
+opencode plugin add opencode-acme-plugin@1.2.0
+opencode plugin add 'git+ssh://git@github.com/acme/opencode-plugin.git#main'
+
+opencode plugin list
+opencode plugin check
+opencode plugin update
+opencode plugin remove opencode-acme-plugin@1.2.0
+```
+
+The installer accepts npm packages and npm-compatible Git specifications, including
+private repositories accessible through existing Git credentials. SSH installs require
+working SSH authentication; a GitHub CLI login alone does not necessarily configure SSH.
+For installable packages, this avoids manually cloning the repository and editing
+the `plugins` array. The package still needs to contain or reliably build its GUI bundle.
+
+**Do not substitute this repository's Git URL into those commands yet and expect the
+desktop panel to be available.** First we need to ship the prebuilt GUI in the
+installable version, or implement and verify an installation-time build. Once that is
+done, a small Bash wrapper can check prerequisites and credentials, call
+`opencode plugin add`, and verify the installation without rewriting existing config.
+The one-time model-cost consent remains an explicit user choice.
+
+For a desktop connected to a remote server, installation is required on **both**:
+the desktop's own local server loads the GUI, while the remote server runs updates
+and stores documents. This applies to both local-path and future package installations.
+
+`opencode plugin update` skips local-directory plugins. **Current clones are updated
+with Git and rebuilt**, as shown below; native package updates are the future packaged flow.
+
+See the official [plugin installation documentation](https://opencode.ai/v2/docs/plugins).
+
 ## Build
 
 Requires Node **22.12+** and npm.
@@ -26,6 +77,9 @@ The build produces `dist/gui-experimental.cjs`. The server entry remains TypeScr
 loaded by OpenCode's plugin loader.
 
 ## Install on another machine
+
+This is the currently supported **manual development installation**, not the native
+package-installation flow described above.
 
 The repository is private: authenticate with a GitHub account that has access.
 Using GitHub CLI:

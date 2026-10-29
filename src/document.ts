@@ -62,6 +62,12 @@ export class Documents {
     const previous = this.locks.get(sessionID) ?? Promise.resolve()
     const next = previous.catch(() => {}).then(async () => {
       const document = Document.parse(update(await this.get(sessionID)))
+      // Optional Zod fields may be explicitly undefined, but OpenCode's RPC
+      // response encoder requires JSON values. Return the same JSON-safe shape
+      // we store, rather than reporting a failed save after it was persisted.
+      for (const key of ["lastTurn", "error"] as const) {
+        if (document[key] === undefined) delete document[key]
+      }
       await this.storage.set(`documents/${sessionID}`, document)
       return document
     })

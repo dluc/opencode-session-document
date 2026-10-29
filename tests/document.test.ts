@@ -46,4 +46,15 @@ describe("session documents", () => {
     await documents.save("ses_a", 1, "Persistent", true)
     expect((await new Documents(storage).get("ses_a"))?.markdown).toBe("Persistent")
   })
+
+  it("returns JSON-safe save responses without undefined optional fields", async () => {
+    const { documents } = memoryDocuments()
+    await documents.create("ses_a")
+    const saved = await documents.save("ses_a", 1, "Saved through RPC", false)
+    expect(saved).not.toHaveProperty("error")
+    expect(saved).toEqual(JSON.parse(JSON.stringify(saved)))
+    const refreshed = await documents.change("ses_a", current => ({ ...current!, lastTurn: undefined }))
+    expect(refreshed).not.toHaveProperty("lastTurn")
+    expect(refreshed).toEqual(JSON.parse(JSON.stringify(refreshed)))
+  })
 })

@@ -16,8 +16,31 @@ This is a prototype targeting **OpenCode V2**, developed against the published
 ## Install with OpenCode
 
 The private Git repository includes the prebuilt desktop GUI. **No manual clone,
-`npm ci`, GUI build, or configuration editing is needed for a package installation.**
+`npm ci`, or GUI build is needed for a package installation.** The native CLI also
+registers it without manual configuration editing. A Desktop-managed SSH service
+without a CLI on `PATH` can instead use the remote configuration method in section 2A.
+
+**Install the plugin wherever its components run:**
+
+| Your setup | Laptop/desktop installation | Remote installation |
+| --- | --- | --- |
+| Local sessions only | Required for the panel and local updates | Not needed |
+| Remote service managed by Desktop over SSH | Required for the panel | Required in each existing SSH-managed service; see 2A |
+| Manually installed remote service | Required for the panel | Required in each remote service; see 2B |
+
+Installing locally does **not** copy or register the plugin on remote servers.
+Desktop provisioning the remote OpenCode service does **not** provision this plugin.
+There is currently no cross-server installation/synchronization feature in this plugin.
+
 You need OpenCode V2 and Git access to this private repository on each machine.
+If this plugin is already configured through a local path, follow
+[the migration instructions](#migrating-an-existing-local-path-installation) first;
+do not register both the local checkout and the Git package.
+
+### 1. Install on the laptop/desktop
+
+Run the following command in a **local terminal on the laptop/desktop**, not in a
+remote session terminal. The native CLI must be available as `opencode`.
 
 With working HTTPS Git credentials:
 
@@ -41,11 +64,78 @@ opencode plugin add 'git+ssh://git@github.com/dluc/opencode-session-document.git
 Choose **one** URL form and keep using it for updates/removal. A GitHub CLI login
 alone does not necessarily configure SSH. Never put a token in the installation URL.
 
-**Desktop connected to a remote server:** run the installation on **both** the
-laptop/desktop and the remote session server. The desktop's own server loads the
-panel; the remote server runs document updates and stores the documents. Global
-configuration reloads automatically. The one-time **Enable automatic documents**
-action and model-cost notice still apply.
+If you use remote sessions, also complete **2A or 2B on every remote server**.
+The local installation supplies the panel; the remote installation performs the
+updates and stores documents for remote sessions.
+
+### 2A. Remote service managed by Desktop over SSH
+
+Use this when you add an SSH server in Desktop and Desktop uploads/starts the remote
+OpenCode service for you. **Do not install a second OpenCode service.** You only
+need to register the plugin with the service that already exists.
+
+1. Connect through Desktop so the managed remote service is running.
+2. Open a terminal **on that remote machine**, using the same account as Desktop's
+   SSH connection. Configure Git access to this private repository for that account.
+   Your laptop's GitHub authentication is not automatically available on the server.
+3. Add the Git package to the remote service's user-global `opencode.json(c)`.
+   The default directory is `~/.config/opencode/`, or
+   `$XDG_CONFIG_HOME/opencode/` when the service uses `XDG_CONFIG_HOME`.
+   Edit whichever `.json` or `.jsonc` file is already in use; preserve other settings
+   and append to the existing `plugins` array rather than replacing it:
+
+   ```jsonc
+   {
+     "$schema": "https://opencode.ai/config.json",
+     "plugins": [
+       "git+https://github.com/dluc/opencode-session-document.git#main"
+     ]
+   }
+   ```
+
+4. The running service reloads configuration and installs the missing package.
+   Allow installation to finish; use `/reload` in a session on that remote server
+   if needed. No manual service installation or restart is required.
+
+The managed `opencode` executable may not be on the remote shell's `PATH`. If you
+know the active managed executable's path, you can run its `plugin add` command
+instead of editing configuration. Do not hard-code a cached version directory or
+install another CLI just to make the bare `opencode` command available.
+
+### 2B. Manually installed remote service
+
+Use this when you or an administrator installed OpenCode on a server and Desktop
+connects to that existing service rather than provisioning it over SSH.
+
+1. Open a shell **on the remote machine/container** under the account that owns
+   the running OpenCode service. Use its configuration environment, including any
+   custom `XDG_CONFIG_HOME`. Running as another account would configure the wrong user.
+2. Ensure that account has Git access to this private repository.
+3. Run the existing installation's CLI there:
+
+   ```sh
+   opencode plugin add 'git+https://github.com/dluc/opencode-session-document.git#main'
+   ```
+
+   If it is not on `PATH`, invoke the executable used by that existing service.
+   Do not run this only on your laptop or install a second service.
+4. The service reloads its configuration; use `/reload` in a remote session if needed.
+
+For containerized services, make sure the service's configuration, installed plugin
+cache, and document storage are persisted as appropriate for that deployment.
+
+**Authentication in both remote modes:** use Git credentials available to the remote
+service account and outbound access to GitHub/the dependency registry. If GitHub CLI
+is already available there, `gh auth login` and `gh auth setup-git` can configure
+HTTPS credentials. SSH access to your server is separate from SSH access to GitHub.
+Do not copy a laptop token into the README, plugin options, or package URL.
+
+### 3. Verify and update each installation
+
+After both sides are installed, open a session on the intended server and enable
+automatic documents after reviewing the model-cost notice. **Seeing the panel alone
+only confirms the local GUI:** verify that the document loads, saves, and updates in
+that remote session too.
 
 Verify, check for updates, and update this plugin (HTTPS example):
 
@@ -54,6 +144,10 @@ opencode plugin list
 opencode plugin check
 opencode plugin update 'git+https://github.com/dluc/opencode-session-document.git#main'
 ```
+
+Run these commands separately for each installed service. For an SSH-managed service
+without `opencode` on `PATH`, use its actual managed executable. Reconnecting from
+Desktop is not a request to update all remote plugin installations.
 
 To remove a package installation:
 

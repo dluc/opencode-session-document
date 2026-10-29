@@ -54,6 +54,12 @@ not a complete SBOM, security audit, or approval statement. Follow your organiza
 rules for bundled software. Source development still requires build dependencies
 and an environment authorized to obtain them.
 
+Version **0.1.1** was tested with **OpenCode 2.2.0** in fresh isolated installations.
+Installation, server/RPC/GUI activation, document create/save/read, and the served
+GUI bundle checksum all passed. Installation against a deliberately unavailable
+test registry also passed, with **zero registry requests**. Neither test enabled
+automatic model requests.
+
 ### 1. Install on the laptop/desktop
 
 Run the following command in a **local terminal on the laptop/desktop**, not in a

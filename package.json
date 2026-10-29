@@ -1,6 +1,6 @@
 {
   "name": "opencode-session-document",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "A living, editable Markdown and Mermaid document for each OpenCode session",
@@ -9,33 +9,36 @@
     "url": "git+https://github.com/dluc/opencode-session-document.git"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./rpc": "./src/rpc.ts",
+    ".": "./dist/server.js",
+    "./rpc": "./dist/rpc.js",
     "./gui-experimental": "./dist/gui-experimental.cjs"
   },
   "files": [
-    "src",
+    "dist/server.js",
+    "dist/rpc.js",
     "dist/gui-experimental.cjs",
+    "dist/*.components.json",
+    "dist/*.third-party.txt",
     "README.md"
   ],
   "scripts": {
     "build:gui": "vite build",
+    "build:runtime": "vite build --config vite.runtime.config.ts && vite build --config vite.runtime.config.ts --mode rpc",
+    "build:all": "npm run build:runtime && npm run build:gui",
     "dev": "vite build --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:browser": "node scripts/check-diagrams.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "check": "npm run typecheck && npm test && npm run build:gui && npm run check:package"
+    "check": "npm run typecheck && npm test && npm run build:all && npm run check:package"
   },
-  "dependencies": {
+  "devDependencies": {
     "@opencode/plugin": "2.2.0",
     "dompurify": "^3.3.0",
     "effect": "^4.0.1",
     "marked": "^17.0.0",
     "mermaid": "^12.2.0",
-    "zod": "^4.1.0"
-  },
-  "devDependencies": {
+    "zod": "^4.1.0",
     "@types/node": "^22.0.0",
     "jsdom": "^26.0.0",
     "solid-js": "^1.9.0",

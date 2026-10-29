@@ -15,8 +15,10 @@ This is a prototype targeting **OpenCode V2**, developed against the published
 
 ## Install with OpenCode
 
-The private Git repository includes the prebuilt desktop GUI. **No manual clone,
-`npm ci`, or GUI build is needed for a package installation.** The native CLI also
+The private Git repository includes self-contained **server, RPC, and desktop GUI**
+artifacts. **No manual clone, `npm ci`, or build is needed for a package installation.**
+There are no production, optional, or peer package dependencies to fetch from an npm
+registry. The native CLI also
 registers it without manual configuration editing. A Desktop-managed SSH service
 without a CLI on `PATH` can instead use the remote configuration method in section 2A.
 
@@ -36,6 +38,21 @@ You need OpenCode V2 and Git access to this private repository on each machine.
 If this plugin is already configured through a local path, follow
 [the migration instructions](#migrating-an-existing-local-path-installation) first;
 do not register both the local checkout and the Git package.
+
+### Restricted npm feeds
+
+Package installation does not need `@opencode/plugin` or other runtime packages
+from your npm feed. The SDK helpers and validators used by the server/RPC entrypoints
+are bundled; the GUI uses OpenCode's provided host modules and bundles its other
+libraries. Your registry settings remain unchanged. Git access to this private
+repository is still required; this is not an offline Git installation.
+
+Third-party code has not been removed or made exempt from organizational approval.
+Each bundle ships a component inventory and available upstream license/notice text
+in its `.components.json` and `.third-party.txt` companions. These disclosures are
+not a complete SBOM, security audit, or approval statement. Follow your organization's
+rules for bundled software. Source development still requires build dependencies
+and an environment authorized to obtain them.
 
 ### 1. Install on the laptop/desktop
 
@@ -188,13 +205,16 @@ npm ci
 npm run check
 ```
 
-The build produces `dist/gui-experimental.cjs`. The server entry remains TypeScript,
-loaded by OpenCode's plugin loader.
-The GUI bundle is committed so Git-package users do not need build tools. After
-changing GUI code or its bundled dependencies, run `npm run check` and commit the
-updated bundle alongside the source. `npm run check:package` checks that all exported
-entrypoints, including the prebuilt GUI, are present in the installable package.
-The standalone developer build command is **`npm run build:gui`**, not `npm run build`:
+The build produces the prebuilt server, RPC contract, desktop GUI, component inventories,
+and third-party notices. All installable artifacts are committed; all npm dependencies
+are development-only. OpenCode loads the compiled server, not the TypeScript source.
+After changing source or bundled dependencies, run `npm run check` and commit the
+updated artifacts alongside the source. `npm run check:package` checks exported
+entrypoints, absence of registry runtime dependencies, and module resolution without
+access to this checkout's `node_modules`.
+
+Use **`npm run build:all`** for a complete developer build, `npm run build:runtime`
+for server/RPC only, or `npm run build:gui` for GUI only. There is no `npm run build`:
 npm interprets a conventional `build` script as a reason to prepare a Git dependency
 at installation time. This package deliberately avoids that and other preparation hooks.
 
@@ -211,12 +231,12 @@ gh auth login
 gh repo clone dluc/opencode-session-document
 cd opencode-session-document
 npm ci
-npm run build:gui
+npm run build:all
 ```
 
 Then register this clone's absolute directory in that machine's OpenCode configuration
-as described below. Dependencies and other build output are not committed; the one
-prebuilt GUI bundle is included for Git-package installations.
+as described below. `node_modules` and unrelated build output are not committed;
+the runtime artifacts, inventories, and notices are included for Git-package installations.
 For Desktop connected to a remote server, install a clone on both the desktop machine
 (GUI) and the session server (background updates and storage).
 
@@ -225,7 +245,7 @@ To update an installation without local source changes:
 ```sh
 git pull --ff-only
 npm ci
-npm run build:gui
+npm run build:all
 ```
 
 OpenCode watches the local plugin directory and reloads changed components. Use
@@ -286,7 +306,7 @@ For UI development, `npm run dev` rebuilds the bundle and the desktop app reload
 
 | Change | Remote session server | Desktop/laptop |
 | --- | --- | --- |
-| Summary prompt, brief limits, updater logic (`src/updater.ts`, `src/brief.ts`) | Update source; no GUI build needed | No update needed |
+| Summary prompt, brief limits, updater logic | Update and run `npm run build:runtime` | No update needed |
 | Panel layout, editor, Markdown rendering | Usually unchanged | Update and run `npm run build:gui` |
 | Shared RPC/schema changes | Update | Update and rebuild |
 | Full release with mixed changes | Update | Update and rebuild |
@@ -295,9 +315,10 @@ This table describes development checkouts. Native Git-package users instead run
 `opencode plugin update` with the configured Git target on the indicated machine(s),
 without a local build.
 
-OpenCode watches local server plugin source dependencies and reloads them after changes.
-Use `/reload` if necessary; a service restart is not required. This concise-brief change
-does not alter the RPC contract and works with the existing laptop panel.
+OpenCode watches the compiled plugin artifacts and reloads them after changes.
+In development, source edits require a rebuild before they affect the installed plugin.
+Use `/reload` if necessary; a service restart is not required. Server-only policy changes
+that do not alter the RPC contract work with the existing laptop panel.
 After updating the server, click **Refresh** to condense an existing long document,
 or wait for the next completed conversational turn. Updates must be enabled globally
 and for that session. Existing documents are not destructively truncated during installation.

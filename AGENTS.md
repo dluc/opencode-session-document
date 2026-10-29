@@ -7,8 +7,9 @@ This is an independent Git repository. The parent folder is only a workspace.
 - OpenCode V2, developed against `@opencode/plugin` 2.2.0.
 - Server entry: `src/index.ts`; desktop GUI: `src/gui.tsx`; shared RPC: `src/rpc.ts`.
 - GUI API is experimental. Consult https://opencode.ai/v2/docs/build/plugins/gui before changing host integration.
-- `dist/gui-experimental.cjs` is tracked for native private-Git installs. Rebuild and commit it with GUI changes; other build output and `node_modules` remain ignored. No installation-time build hook is required.
-- Use `npm run build:gui` for developer builds. Do not add a conventional `build`, `prepare`, `prepack`, `preinstall`, `install`, or `postinstall` script: npm's Git fetcher would trigger installation-time preparation.
+- Prebuilt server, RPC, GUI, component inventories, and third-party notices are tracked for native private-Git installs. All npm dependencies must remain development-only; package installation must not need a registry.
+- Use `npm run build:all` for complete builds (`build:runtime` or `build:gui` for one side). Rebuild and commit the affected artifacts with source changes; OpenCode loads compiled runtime files, not source. Do not add a conventional `build`, `prepare`, `prepack`, `preinstall`, `install`, or `postinstall` script: npm's Git fetcher would trigger installation-time preparation.
+- Keep bundled component disclosures and license notices visible. Bundling is a distribution choice, not an exemption from organizational approval or an instruction to bypass registry policy.
 - Use npm and the committed lockfile. Run commands from this directory.
 
 ## Invariants

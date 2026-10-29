@@ -1,6 +1,10 @@
 node_modules/
 dist/*
 !dist/gui-experimental.cjs
+!dist/server.js
+!dist/rpc.js
+!dist/*.components.json
+!dist/*.third-party.txt
 coverage/
 *.tgz
 .env

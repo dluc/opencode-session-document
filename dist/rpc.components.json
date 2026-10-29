@@ -1,0 +1,16 @@
+{
+  "target": "rpc",
+  "note": "Bundled component inventory, not a complete SBOM or approval statement. GUI host-provided modules are not bundled.",
+  "components": [
+    {
+      "name": "@opencode/schema",
+      "version": "2.2.0",
+      "license": "MIT"
+    },
+    {
+      "name": "zod",
+      "version": "4.6.7",
+      "license": "MIT"
+    }
+  ]
+}

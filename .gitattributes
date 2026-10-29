@@ -1,1 +1,4 @@
-dist/gui-experimental.cjs -diff -whitespace linguist-generated=true
+dist/*.js -diff -whitespace linguist-generated=true
+dist/*.cjs -diff -whitespace linguist-generated=true
+dist/*.components.json linguist-generated=true
+dist/*.third-party.txt -whitespace linguist-generated=true

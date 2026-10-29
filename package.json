@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "description": "A living, editable Markdown and Mermaid document for each OpenCode session",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dluc/opencode-session-document.git"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./rpc": "./src/rpc.ts",
@@ -11,7 +15,7 @@
   },
   "files": [
     "src",
-    "dist",
+    "dist/gui-experimental.cjs",
     "README.md"
   ],
   "scripts": {
@@ -20,7 +24,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:browser": "node scripts/check-diagrams.mjs",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check:package": "node scripts/check-package.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm run check:package"
   },
   "dependencies": {
     "@opencode/plugin": "2.2.0",

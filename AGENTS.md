@@ -7,6 +7,7 @@ This is an independent Git repository. The parent folder is only a workspace.
 - OpenCode V2, developed against `@opencode/plugin` 2.2.0.
 - Server entry: `src/index.ts`; desktop GUI: `src/gui.tsx`; shared RPC: `src/rpc.ts`.
 - GUI API is experimental. Consult https://opencode.ai/v2/docs/build/plugins/gui before changing host integration.
+- `dist/gui-experimental.cjs` is tracked for native private-Git installs. Rebuild and commit it with GUI changes; other build output and `node_modules` remain ignored. No installation-time build hook is required.
 - Use npm and the committed lockfile. Run commands from this directory.
 
 ## Invariants
@@ -30,6 +31,7 @@ This is an independent Git repository. The parent folder is only a workspace.
 
 `npm run check` runs strict type checking, Vitest tests, and the actual desktop bundle build.
 `npm audit` checks dependencies.
+`npm run check:package` verifies installable package contents and all exported entrypoints; it also runs at the end of `npm run check`.
 `npm run test:browser` checks actual Mermaid labels, dimensions, and viewer controls in Chromium (set `CHROME_BIN` if needed). Keep this separate from browser-independent checks.
 
 Unit/DOM/mock-host tests do not establish compatibility with a running desktop app. Report live app testing separately.

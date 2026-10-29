@@ -13,56 +13,70 @@ decisions, progress, and blockers without losing the thread of the conversation.
 This is a prototype targeting **OpenCode V2**, developed against the published
 `@opencode/plugin` **2.2.0**. The desktop GUI plugin API is experimental. V1 is not supported.
 
-## Installation status
+## Install with OpenCode
 
-**For this repository today, use the [clone/build/local-path instructions](#install-on-another-machine)
-below.** They are the development installation used for this prototype.
+The private Git repository includes the prebuilt desktop GUI. **No manual clone,
+`npm ci`, GUI build, or configuration editing is needed for a package installation.**
+You need OpenCode V2 and Git access to this private repository on each machine.
 
-OpenCode has a native plugin installer, but this repository is **not yet packaged
-for a complete one-command Git installation**: the desktop panel needs
-`dist/gui-experimental.cjs`, which is generated locally and excluded from Git.
-There is no install/build lifecycle hook configured to produce it during package
-installation, and that installation path has not been verified.
-
-There is also **no `install.sh` yet**. A single-script installer and a prebuilt,
-directly installable package are proposed improvements, not features already shipped.
-
-### How OpenCode plugins are normally installed
-
-OpenCode V2 can install and register global package plugins with its CLI:
+With working HTTPS Git credentials:
 
 ```sh
-# Examples for installable packages, not this repository's current checkout:
-opencode plugin add opencode-acme-plugin@1.2.0
-opencode plugin add 'git+ssh://git@github.com/acme/opencode-plugin.git#main'
-
-opencode plugin list
-opencode plugin check
-opencode plugin update
-opencode plugin remove opencode-acme-plugin@1.2.0
+opencode plugin add 'git+https://github.com/dluc/opencode-session-document.git#main'
 ```
 
-The installer accepts npm packages and npm-compatible Git specifications, including
-private repositories accessible through existing Git credentials. SSH installs require
-working SSH authentication; a GitHub CLI login alone does not necessarily configure SSH.
-For installable packages, this avoids manually cloning the repository and editing
-the `plugins` array. The package still needs to contain or reliably build its GUI bundle.
+If you use GitHub CLI, configure HTTPS Git authentication once before installing:
 
-**Do not substitute this repository's Git URL into those commands yet and expect the
-desktop panel to be available.** First we need to ship the prebuilt GUI in the
-installable version, or implement and verify an installation-time build. Once that is
-done, a small Bash wrapper can check prerequisites and credentials, call
-`opencode plugin add`, and verify the installation without rewriting existing config.
-The one-time model-cost consent remains an explicit user choice.
+```sh
+gh auth login
+gh auth setup-git
+```
 
-For a desktop connected to a remote server, installation is required on **both**:
-the desktop's own local server loads the GUI, while the remote server runs updates
-and stores documents. This applies to both local-path and future package installations.
+Alternatively, with SSH access already configured:
 
-`opencode plugin update` skips local-directory plugins. **Current clones are updated
-with Git and rebuilt**, as shown below; native package updates are the future packaged flow.
+```sh
+opencode plugin add 'git+ssh://git@github.com/dluc/opencode-session-document.git#main'
+```
 
-See the official [plugin installation documentation](https://opencode.ai/v2/docs/plugins).
+Choose **one** URL form and keep using it for updates/removal. A GitHub CLI login
+alone does not necessarily configure SSH. Never put a token in the installation URL.
+
+**Desktop connected to a remote server:** run the installation on **both** the
+laptop/desktop and the remote session server. The desktop's own server loads the
+panel; the remote server runs document updates and stores the documents. Global
+configuration reloads automatically. The one-time **Enable automatic documents**
+action and model-cost notice still apply.
+
+Verify, check for updates, and update this plugin (HTTPS example):
+
+```sh
+opencode plugin list
+opencode plugin check
+opencode plugin update 'git+https://github.com/dluc/opencode-session-document.git#main'
+```
+
+To remove a package installation:
+
+```sh
+opencode plugin remove 'git+https://github.com/dluc/opencode-session-document.git#main'
+```
+
+The `#main` branch tracks the latest prototype. A full Git commit hash can be used
+instead when you need a pinned installation; pinned revisions are not updated by
+`plugin update`. The repository remains private and is not published to npm.
+No Bash wrapper is required; the native CLI performs installation and registration.
+
+### Migrating an existing local-path installation
+
+Before adding the Git package, remove only this plugin's old local-directory entry
+from the relevant `opencode.json(c)` file(s), preserving unrelated settings. Do not
+configure the same plugin simultaneously through a local path and a Git URL.
+Keep the development checkout if you still use it, and do not delete OpenCode's
+data directory or document storage. Migrate each machine independently.
+
+Local-directory installations still use `git pull` and a rebuild; `opencode plugin update`
+skips them. See the [development installation](#development-installation-on-another-machine)
+below and the official [plugin documentation](https://opencode.ai/v2/docs/plugins).
 
 ## Build
 
@@ -75,11 +89,15 @@ npm run check
 
 The build produces `dist/gui-experimental.cjs`. The server entry remains TypeScript,
 loaded by OpenCode's plugin loader.
+The GUI bundle is committed so Git-package users do not need build tools. After
+changing GUI code or its bundled dependencies, run `npm run check` and commit the
+updated bundle alongside the source. `npm run check:package` checks that all exported
+entrypoints, including the prebuilt GUI, are present in the installable package.
 
-## Install on another machine
+## Development installation on another machine
 
-This is the currently supported **manual development installation**, not the native
-package-installation flow described above.
+Use this alternative when you want to edit plugin source. For ordinary installation,
+use `opencode plugin add` above.
 
 The repository is private: authenticate with a GitHub account that has access.
 Using GitHub CLI:
@@ -93,7 +111,8 @@ npm run build
 ```
 
 Then register this clone's absolute directory in that machine's OpenCode configuration
-as described below. Build output and dependencies are intentionally not committed.
+as described below. Dependencies and other build output are not committed; the one
+prebuilt GUI bundle is included for Git-package installations.
 For Desktop connected to a remote server, install a clone on both the desktop machine
 (GUI) and the session server (background updates and storage).
 
@@ -112,9 +131,12 @@ The update table below explains when only one of the two machines needs updating
 
 ## Try it in OpenCode Desktop
 
-1. Make this repository available **on the machine running OpenCode's background service**,
+If you installed with `opencode plugin add`, skip the local-path configuration below
+and start at step 4. For a remote connection, first install on both machines.
+
+1. For a development installation, make this repository available **on the machine running OpenCode's background service**,
    and build it there. A path in a remote coding environment is not necessarily a path on your desktop.
-2. Add its absolute directory to `plugins` in your **global**
+2. For that development installation, add its absolute directory to `plugins` in your **global**
    `~/.config/opencode/opencode.jsonc` (or its existing `.json` equivalent).
    Preserve your other settings and existing plugin entries:
 

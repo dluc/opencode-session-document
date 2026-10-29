@@ -36,3 +36,4 @@ This is an independent Git repository. The parent folder is only a workspace.
 `npm run test:browser` checks actual Mermaid labels, dimensions, and viewer controls in Chromium (set `CHROME_BIN` if needed). Keep this separate from browser-independent checks.
 
 Unit/DOM/mock-host tests do not establish compatibility with a running desktop app. Report live app testing separately.
+Native installer smoke tests must isolate XDG config/data/cache/state, keep model automation disabled, and stop only the temporary service they created. Never replace the developer's active local-path installation while testing Git packages.

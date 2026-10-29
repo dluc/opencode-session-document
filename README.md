@@ -66,6 +66,13 @@ instead when you need a pinned installation; pinned revisions are not updated by
 `plugin update`. The repository remains private and is not published to npm.
 No Bash wrapper is required; the native CLI performs installation and registration.
 
+Native HTTPS Git installation and updates were verified with **OpenCode 2.2.1**
+using isolated configuration, data, and cache directories. The smoke test checked
+server/RPC/GUI activation, the served GUI bundle against the committed file,
+document create/save/read over HTTP RPC, and document preservation across a Git
+package update. Automation stayed disabled, so the test made no paid model requests.
+SSH is an alternative supported by OpenCode; the smoke test used HTTPS credentials.
+
 ### Migrating an existing local-path installation
 
 Before adding the Git package, remove only this plugin's old local-directory entry
@@ -371,9 +378,11 @@ one-time enablement, automatic tab/document creation, non-intrusive tab selectio
 close/return behavior, global disable, and rendering safety.
 They do not invoke a paid model or a live OpenCode service.
 
-The initial implementation was built and tested without an installed OpenCode
-executable/Desktop app. **Live host compatibility and real-model summary quality still
-need the manual trial above.** A passing bundle build is not a live-app test.
+Unit/DOM tests use mocked hosts, while the Chromium checks exercise actual diagram
+rendering. Native Git installation and RPC were additionally tested against a real
+isolated OpenCode 2.2.1 service as described above. These checks do **not** substitute
+for a full Desktop UI trial or verification of real-model summary quality; use the
+manual trial checklist for those. A passing bundle build alone is not a live-app test.
 
 Other current limitations:
 

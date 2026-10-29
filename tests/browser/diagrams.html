@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Diagram rendering checks</title>
+    <link rel="stylesheet" href="/src/panel.css" />
+    <style>body { margin: 0; width: 440px; font-family: sans-serif; } #diagrams { padding: 16px; }</style>
+  </head>
+  <body>
+    <main id="diagrams"></main>
+    <script type="module">
+      import mermaid from "mermaid"
+      import { createDiagram, MERMAID_CONFIG } from "/src/diagram.ts"
+      window.diagramChecks = (async () => {
+        const settle = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+        const cases = [
+          { name: "tall flowchart", source: "flowchart TD\n" + Array.from({ length: 18 }, (_, i) => `N${i}[Step ${i + 1}: verify implementation]${i < 17 ? ` --> N${i + 1}` : ""}`).join("\n"), labels: ["Step 1:", "Step 18:"] },
+          { name: "subgraphs and edge labels", source: 'flowchart LR\nsubgraph chosen[Chosen approach]\n A[Investigate] -->|confirmed| B[Implement]\nend\nB --> C[Verify]', labels: ["Chosen approach", "Investigate", "confirmed", "Implement", "Verify"] },
+          { name: "sequence", source: 'sequenceDiagram\n participant U as User\n participant A as Agent\n U->>A: Describe goal\n A-->>U: Verification results', labels: ["User", "Agent", "Describe goal", "Verification results"] },
+          { name: "state", source: 'stateDiagram-v2\n [*] --> Planning\n Planning --> Building: approved\n Building --> Verified: tests pass\n Verified --> [*]', labels: ["Planning", "Building", "approved", "Verified", "tests pass"] },
+        ]
+        mermaid.initialize(MERMAID_CONFIG)
+        const results = []
+        let index = 0
+        for (const test of cases) {
+          const { svg } = await mermaid.render(`browser-test-${index++}`, test.source)
+          const viewer = createDiagram(svg)
+          const diagram = viewer.element
+          document.querySelector("#diagrams").append(diagram)
+          await settle()
+          const viewport = diagram.querySelector('.sd-diagram-viewport')
+          const image = diagram.querySelector('svg')
+          const text = [...image.querySelectorAll('text')].map(node => node.textContent).join(' ')
+          const viewportBounds = viewport.getBoundingClientRect()
+          const imageBounds = image.getBoundingClientRect()
+          const visibleLabels = [...image.querySelectorAll('text')].every(node => {
+            const box = node.getBoundingClientRect()
+            return box.height > 0 && box.top >= viewportBounds.top - 2 && box.bottom <= viewportBounds.bottom + 2
+          })
+          const initialHeight = viewport.clientHeight
+          const initialWidth = imageBounds.width
+          diagram.querySelector('[aria-label="Zoom in diagram"]').click()
+          const zoomWidth = image.getBoundingClientRect().width
+          const zoomWorks = zoomWidth > initialWidth && viewport.getBoundingClientRect().height === viewportBounds.height
+          diagram.querySelector('[aria-label="Expand diagram"]').click()
+          const expandWorks = viewport.clientHeight > initialHeight
+          diagram.querySelector('[aria-label="Fit diagram to viewport"]').click()
+          diagram.querySelector('[aria-label="Collapse diagram"]').click()
+          await settle()
+          const fitWorks = diagram.querySelector('[aria-label="Fit diagram to viewport"]').getAttribute('aria-pressed') === 'true' && viewport.clientHeight === initialHeight
+          document.body.style.width = '280px'
+          await settle()
+          const resizeWorks = image.getBoundingClientRect().width <= viewport.clientWidth + 1
+          document.body.style.width = '440px'
+          await settle()
+          const result = {
+            name: test.name, labelsPresent: test.labels.every(label => text.includes(label)),
+            svgTextLabels: image.querySelectorAll('text').length,
+            htmlLabels: image.querySelectorAll('foreignObject').length,
+            visibleLabels, diagramHeight: diagram.getBoundingClientRect().height,
+            fitWithinViewport: imageBounds.height <= viewportBounds.height + 1 && imageBounds.width <= viewportBounds.width + 1,
+            zoomWorks, expandWorks, fitWorks, resizeWorks,
+            initialWidth, zoomWidth,
+          }
+          result.passed = result.labelsPresent && result.visibleLabels && !result.htmlLabels && result.diagramHeight <= 450 && result.fitWithinViewport && zoomWorks && expandWorks && fitWorks && resizeWorks
+          results.push(result)
+        }
+        return { cases: results, passed: results.every(result => result.passed) }
+      })()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+.sd-panel { --sd-line: color-mix(in srgb, currentColor 14%, transparent); --sd-muted: color-mix(in srgb, currentColor 62%, transparent); color: inherit; padding: 24px; height: 100%; overflow: auto; font-family: inherit; font-size: 13px; line-height: 1.65; }
+.sd-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--sd-line); margin-bottom: 16px; }
+.sd-eyebrow { font-size: 10px; letter-spacing: .16em; color: var(--sd-muted); }
+.sd-header h2 { font-family: Georgia, 'Times New Roman', serif; font-size: 25px; font-weight: 400; margin: 3px 0 0; letter-spacing: -.025em; }
+.sd-revision { border: 1px solid var(--sd-line); padding: 2px 8px; border-radius: 4px; font: 11px monospace; color: var(--sd-muted); }
+.sd-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; }
+.sd-panel button { cursor: pointer; border: 1px solid transparent; border-radius: 5px; background: #34715b; color: white; padding: 6px 11px; font: inherit; font-size: 12px; transition: background-color 120ms; }
+.sd-panel button:hover { background: #285a48; }
+.sd-panel button.sd-secondary { background: transparent; color: inherit; border-color: var(--sd-line); }
+.sd-panel button.sd-secondary:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+.sd-panel button:disabled { opacity: .5; cursor: not-allowed; }
+.sd-panel :is(button, input, textarea, summary, a):focus-visible { outline: 2px solid #6caa91; outline-offset: 3px; }
+.sd-status, .sd-footer { color: var(--sd-muted); font-size: 11px; }
+.sd-status { margin-left: auto; }
+.sd-footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--sd-line); }
+.sd-empty { padding: 24px 0; max-width: 46ch; color: var(--sd-muted); }
+.sd-empty h3 { font-family: Georgia, serif; font-size: 21px; font-weight: 400; color: inherit; }
+.sd-notice { padding: 10px 12px; border-left: 2px solid #ba914c; background: color-mix(in srgb, #ba914c 10%, transparent); margin: 12px 0; overflow-wrap: anywhere; }
+.sd-notice button { display: block; margin-top: 8px; }
+.sd-label { display: block; color: var(--sd-muted); font-size: 11px; margin-bottom: 8px; }
+.sd-editor { display: block; width: 100%; min-height: 50vh; resize: vertical; border: 1px solid var(--sd-line); border-radius: 5px; background: transparent; color: inherit; padding: 14px; font: 12px/1.8 ui-monospace, monospace; tab-size: 2; box-sizing: border-box; }
+.sd-checkbox { display: flex; gap: 8px; align-items: center; margin: 14px 0 6px; }
+.sd-checkbox input { accent-color: #34715b; }
+.sd-markdown { overflow-wrap: anywhere; }
+.sd-markdown h1 { font-family: Georgia, serif; font-size: 26px; font-weight: 400; line-height: 1.25; margin: 24px 0 18px; }
+.sd-markdown h2 { font-size: 15px; font-weight: 600; margin: 26px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--sd-line); }
+.sd-markdown h3 { font-size: 13px; font-weight: 600; margin: 20px 0 6px; }
+.sd-markdown p { margin: 10px 0; }
+.sd-markdown :is(ul, ol) { padding-left: 22px; list-style: revert; }
+.sd-markdown li { margin: 5px 0; }
+.sd-markdown a { color: #519779; text-decoration: underline; }
+.sd-markdown pre { overflow-x: auto; padding: 12px; border: 1px solid var(--sd-line); border-radius: 4px; white-space: pre; }
+.sd-markdown code { font: 11px/1.7 ui-monospace, monospace; }
+.sd-markdown blockquote { margin-left: 0; padding-left: 14px; border-left: 2px solid var(--sd-line); color: var(--sd-muted); }
+.sd-markdown table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.sd-markdown :is(th, td) { border: 1px solid var(--sd-line); padding: 6px 10px; text-align: left; }
+.sd-markdown summary { cursor: pointer; font-size: 11px; color: var(--sd-muted); }
+.sd-diagram { background: #fafaf7; color: #252e29; border: 1px solid var(--sd-line, #d6ded7); border-radius: 5px; margin: 14px 0 6px; max-width: 100%; overflow: hidden; }
+.sd-diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 8px; border-bottom: 1px solid #d6ded7; }
+.sd-diagram-title { margin-right: auto; font-size: 11px; font-weight: 600; }
+.sd-panel .sd-diagram-toolbar button, .sd-diagram-toolbar button { font-family: inherit; font-size: 11px; line-height: 1.5; padding: 3px 7px; color: #252e29; background: transparent; border: 1px solid #b5c3b9; border-radius: 4px; cursor: pointer; }
+.sd-diagram-toolbar button:disabled { opacity: .4; cursor: not-allowed; }
+.sd-diagram-toolbar button:focus-visible, .sd-diagram-viewport:focus-visible { outline: 2px solid #34715b; outline-offset: -2px; }
+.sd-diagram-zoom { font: 10px ui-monospace, monospace; min-width: 4ch; text-align: center; }
+.sd-diagram-viewport { width: 100%; height: clamp(180px, 42vh, 360px); overflow: auto; overscroll-behavior: contain; }
+.sd-diagram-expanded .sd-diagram-viewport { height: clamp(300px, 72vh, 720px); }
+.sd-diagram-canvas { display: flex; align-items: center; justify-content: center; width: max-content; min-width: 100%; min-height: 100%; }
+.sd-diagram svg { display: block; flex-shrink: 0; max-width: none; }
+.sd-diagram svg text { fill: #252e29; font: 13px ui-monospace, monospace; }
+.sd-diagram svg tspan { fill: #252e29; }
+.sd-diagram svg :is(rect, circle, ellipse, polygon) { fill: #edf2eb; stroke: #66776c; stroke-width: 1px; }
+.sd-diagram svg path { stroke: #66776c; stroke-width: 1px; fill: none; }
+.sd-diagram svg marker path { fill: #66776c; }
+@media (prefers-reduced-motion: reduce) { .sd-panel button { transition: none; } }

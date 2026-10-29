@@ -16,7 +16,12 @@ for (const [part, target] of Object.entries(manifest.exports)) {
 }
 assert(files.has("dist/gui-experimental.cjs"), "Prebuilt desktop GUI is missing")
 assert(![...files].some((file) => /(^|\/)(node_modules|\.env)(\/|\.|$)/.test(file)), "Unexpected dependency or environment file")
-assert(!manifest.scripts.prepare && !manifest.scripts.postinstall, "Native installation should not require a build hook")
+// npm's Git fetcher prepares packages that declare any of these scripts, even
+// when the GUI is already built. Keep development builds named `build:gui`.
+for (const hook of ["build", "prepare", "prepack", "preinstall", "install", "postinstall"]) {
+  assert(!manifest.scripts[hook], `Git installation must not trigger the ${hook} preparation hook`)
+}
+assert(!manifest.workspaces, "Git installation must not require workspace preparation")
 const bundle = await readFile(new URL("../dist/gui-experimental.cjs", import.meta.url), "utf8")
 assert(bundle.includes("exports.default"), "Desktop bundle has no CommonJS default export")
 console.log(`Package checks passed: ${files.size} files; server, RPC, and prebuilt GUI exports present; no install-time build required.`)

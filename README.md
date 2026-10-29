@@ -93,6 +93,9 @@ The GUI bundle is committed so Git-package users do not need build tools. After
 changing GUI code or its bundled dependencies, run `npm run check` and commit the
 updated bundle alongside the source. `npm run check:package` checks that all exported
 entrypoints, including the prebuilt GUI, are present in the installable package.
+The standalone developer build command is **`npm run build:gui`**, not `npm run build`:
+npm interprets a conventional `build` script as a reason to prepare a Git dependency
+at installation time. This package deliberately avoids that and other preparation hooks.
 
 ## Development installation on another machine
 
@@ -107,7 +110,7 @@ gh auth login
 gh repo clone dluc/opencode-session-document
 cd opencode-session-document
 npm ci
-npm run build
+npm run build:gui
 ```
 
 Then register this clone's absolute directory in that machine's OpenCode configuration
@@ -121,7 +124,7 @@ To update an installation without local source changes:
 ```sh
 git pull --ff-only
 npm ci
-npm run build
+npm run build:gui
 ```
 
 OpenCode watches the local plugin directory and reloads changed components. Use
@@ -183,9 +186,13 @@ For UI development, `npm run dev` rebuilds the bundle and the desktop app reload
 | Change | Remote session server | Desktop/laptop |
 | --- | --- | --- |
 | Summary prompt, brief limits, updater logic (`src/updater.ts`, `src/brief.ts`) | Update source; no GUI build needed | No update needed |
-| Panel layout, editor, Markdown rendering | Usually unchanged | Update and run `npm run build` |
+| Panel layout, editor, Markdown rendering | Usually unchanged | Update and run `npm run build:gui` |
 | Shared RPC/schema changes | Update | Update and rebuild |
 | Full release with mixed changes | Update | Update and rebuild |
+
+This table describes development checkouts. Native Git-package users instead run
+`opencode plugin update` with the configured Git target on the indicated machine(s),
+without a local build.
 
 OpenCode watches local server plugin source dependencies and reloads them after changes.
 Use `/reload` if necessary; a service restart is not required. This concise-brief change

@@ -8,6 +8,7 @@ This is an independent Git repository. The parent folder is only a workspace.
 - Server entry: `src/index.ts`; desktop GUI: `src/gui.tsx`; shared RPC: `src/rpc.ts`.
 - GUI API is experimental. Consult https://opencode.ai/v2/docs/build/plugins/gui before changing host integration.
 - `dist/gui-experimental.cjs` is tracked for native private-Git installs. Rebuild and commit it with GUI changes; other build output and `node_modules` remain ignored. No installation-time build hook is required.
+- Use `npm run build:gui` for developer builds. Do not add a conventional `build`, `prepare`, `prepack`, `preinstall`, `install`, or `postinstall` script: npm's Git fetcher would trigger installation-time preparation.
 - Use npm and the committed lockfile. Run commands from this directory.
 
 ## Invariants

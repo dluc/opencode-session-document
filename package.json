@@ -2,6 +2,7 @@
   "name": "opencode-session-document",
   "version": "0.1.1",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "A living, editable Markdown and Mermaid document for each OpenCode session",
   "repository": {
@@ -20,7 +21,8 @@
     "dist/*.components.json",
     "dist/*.third-party.txt",
     "docs/images/session-document.png",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build:gui": "vite build",

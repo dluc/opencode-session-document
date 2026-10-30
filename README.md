@@ -22,7 +22,7 @@ This is a prototype targeting **OpenCode V2**, developed against the published
 
 ## Install with OpenCode
 
-The private Git repository includes self-contained **server, RPC, and desktop GUI**
+The Git repository includes self-contained **server, RPC, and desktop GUI**
 artifacts. **No manual clone, `npm ci`, or build is needed for a package installation.**
 There are no production, optional, or peer package dependencies to fetch from an npm
 registry. The native CLI also
@@ -41,7 +41,9 @@ Installing locally does **not** copy or register the plugin on remote servers.
 Desktop provisioning the remote OpenCode service does **not** provision this plugin.
 There is currently no cross-server installation/synchronization feature in this plugin.
 
-You need OpenCode V2 and Git access to this private repository on each machine.
+You need OpenCode V2 and GitHub access from each machine. Public HTTPS installation
+does not require a GitHub account, token, or SSH key. If the repository is still private
+or you use a private fork, the installing account must have Git credentials and access.
 If this plugin is already configured through a local path, follow
 [the migration instructions](#migrating-an-existing-local-path-installation) first;
 do not register both the local checkout and the Git package.
@@ -51,7 +53,7 @@ do not register both the local checkout and the Git package.
 Package installation does not need `@opencode/plugin` or other runtime packages
 from your npm feed. The SDK helpers and validators used by the server/RPC entrypoints
 are bundled; the GUI uses OpenCode's provided host modules and bundles its other
-libraries. Your registry settings remain unchanged. Git access to this private
+libraries. Your registry settings remain unchanged. Network access to the Git
 repository is still required; this is not an offline Git installation.
 
 Third-party code has not been removed or made exempt from organizational approval.
@@ -72,18 +74,27 @@ automatic model requests.
 Run the following command in a **local terminal on the laptop/desktop**, not in a
 remote session terminal. The native CLI must be available as `opencode`.
 
-With working HTTPS Git credentials:
+Use HTTPS; no GitHub login is needed when the repository is public:
 
 ```sh
 opencode plugin add 'git+https://github.com/dluc/opencode-session-document.git#main'
 ```
 
-If you use GitHub CLI, configure HTTPS Git authentication once before installing:
+<details>
+<summary>Authentication for a private repository or private fork</summary>
+
+If the repository is still private, authenticate with an account that has access.
+GitHub CLI can configure HTTPS Git credentials:
 
 ```sh
 gh auth login
 gh auth setup-git
 ```
+
+Run authentication setup only on machines that need it. Never put a token in the
+installation URL.
+
+</details>
 
 Alternatively, with SSH access already configured:
 
@@ -91,7 +102,8 @@ Alternatively, with SSH access already configured:
 opencode plugin add 'git+ssh://git@github.com/dluc/opencode-session-document.git#main'
 ```
 
-Choose **one** URL form and keep using it for updates/removal. A GitHub CLI login
+Choose **one** URL form and keep using it for updates/removal. The SSH alternative
+requires GitHub SSH authentication even for a public repository; a GitHub CLI login
 alone does not necessarily configure SSH. Never put a token in the installation URL.
 
 If you use remote sessions, also complete **2A or 2B on every remote server**.
@@ -106,8 +118,9 @@ need to register the plugin with the service that already exists.
 
 1. Connect through Desktop so the managed remote service is running.
 2. Open a terminal **on that remote machine**, using the same account as Desktop's
-   SSH connection. Configure Git access to this private repository for that account.
-   Your laptop's GitHub authentication is not automatically available on the server.
+   SSH connection. Ensure that account can reach GitHub. Public HTTPS access needs
+   no GitHub login. For a private fork or SSH Git URL, configure credentials on that
+   server; your laptop's GitHub authentication is not automatically available there.
 3. Add the Git package to the remote service's user-global `opencode.json(c)`.
    The default directory is `~/.config/opencode/`, or
    `$XDG_CONFIG_HOME/opencode/` when the service uses `XDG_CONFIG_HOME`.
@@ -140,7 +153,8 @@ connects to that existing service rather than provisioning it over SSH.
 1. Open a shell **on the remote machine/container** under the account that owns
    the running OpenCode service. Use its configuration environment, including any
    custom `XDG_CONFIG_HOME`. Running as another account would configure the wrong user.
-2. Ensure that account has Git access to this private repository.
+2. Ensure that account can reach the Git repository. Public HTTPS access needs no
+   GitHub login; private forks and SSH Git URLs require the appropriate credentials.
 3. Run the existing installation's CLI there:
 
    ```sh
@@ -154,11 +168,14 @@ connects to that existing service rather than provisioning it over SSH.
 For containerized services, make sure the service's configuration, installed plugin
 cache, and document storage are persisted as appropriate for that deployment.
 
-**Authentication in both remote modes:** use Git credentials available to the remote
-service account and outbound access to GitHub/the dependency registry. If GitHub CLI
+**Network access and optional authentication in both remote modes:** the service
+account needs outbound access to GitHub, but installation has no npm registry
+dependencies. Public HTTPS access needs no GitHub login. For a private fork or an
+SSH Git URL, use credentials available to that remote service account. If GitHub CLI
 is already available there, `gh auth login` and `gh auth setup-git` can configure
-HTTPS credentials. SSH access to your server is separate from SSH access to GitHub.
-Do not copy a laptop token into the README, plugin options, or package URL.
+HTTPS credentials for a private repository. SSH access to your server is separate
+from SSH access to GitHub. Do not copy a laptop token into the README, plugin options,
+or package URL.
 
 ### 3. Verify and update each installation
 
@@ -187,7 +204,7 @@ opencode plugin remove 'git+https://github.com/dluc/opencode-session-document.gi
 
 The `#main` branch tracks the latest prototype. A full Git commit hash can be used
 instead when you need a pinned installation; pinned revisions are not updated by
-`plugin update`. The repository remains private and is not published to npm.
+`plugin update`. The plugin is distributed through GitHub rather than npm.
 No Bash wrapper is required; the native CLI performs installation and registration.
 
 Native HTTPS Git installation and updates were verified with **OpenCode 2.2.1**
@@ -243,16 +260,17 @@ at installation time. This package deliberately avoids that and other preparatio
 Use this alternative when you want to edit plugin source. For ordinary installation,
 use `opencode plugin add` above.
 
-The repository is private: authenticate with a GitHub account that has access.
-Using GitHub CLI:
+Clone over HTTPS; no GitHub login is needed for a public repository:
 
 ```sh
-gh auth login
-gh repo clone dluc/opencode-session-document
+git clone https://github.com/dluc/opencode-session-document.git
 cd opencode-session-document
 npm ci
 npm run build:all
 ```
+
+If the repository is still private or you are cloning a private fork, configure
+Git authentication for an account with access first.
 
 Then register this clone's absolute directory in that machine's OpenCode configuration
 as described below. `node_modules` and unrelated build output are not committed;
@@ -529,6 +547,15 @@ Other current limitations:
   if that OpenCode version scopes plugin storage by location. Migration is not implemented.
 - Document history/export/deletion UI is not implemented yet.
 - Deleting a session does not currently explicitly remove its document record from plugin storage.
+
+## License
+
+Original project code is licensed under the [MIT License](LICENSE).
+Bundled third-party components retain their own licenses; see the generated
+component inventories and third-party notices shipped with each bundle.
+
+The `private: true` package flag prevents accidental npm publication. It does not
+control GitHub repository visibility or restrict the MIT license.
 
 ## References
 

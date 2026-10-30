@@ -15,6 +15,8 @@ for (const [part, target] of Object.entries(manifest.exports)) {
   assert(files.has(target.replace(/^\.\//, "")), `Package is missing ${part}: ${target}`)
 }
 assert(files.has("dist/gui-experimental.cjs"), "Prebuilt desktop GUI is missing")
+assert.equal(manifest.license, "MIT", "Package license metadata must match the project license")
+assert(files.has("LICENSE"), "The project license must be distributed with the package")
 for (const field of ["dependencies", "optionalDependencies", "peerDependencies"]) {
   assert.equal(Object.keys(manifest[field] ?? {}).length, 0, `Installable package must not require ${field} from an npm feed`)
 }

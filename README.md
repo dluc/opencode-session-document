@@ -10,6 +10,13 @@ decisions, progress, and blockers without losing the thread of the conversation.
 - **Visual:** Markdown preview, tables, code blocks, and rendered Mermaid diagrams.
 - **Conflict-aware:** manual saves use revision checks; background updates never commit over a newer revision.
 
+## Preview
+
+<img src="docs/images/session-document.png" width="640" alt="Session document panel showing a fictional project-search objective, a Mermaid workflow, progress, and next steps." />
+
+*The actual plugin panel rendered in an isolated demo with fictional session content.
+No live workspace, account, server, or conversation data is shown.*
+
 This is a prototype targeting **OpenCode V2**, developed against the published
 `@opencode/plugin` **2.2.0**. The desktop GUI plugin API is experimental. V1 is not supported.
 
@@ -210,6 +217,13 @@ Requires Node **22.12+** and npm.
 npm ci
 npm run check
 ```
+
+To regenerate the README image, run `npm run docs:screenshot` with Chromium available
+(set `CHROME_BIN` if needed). The capture uses the real panel and a deterministic
+fictional fixture in a fresh browser profile; it does not connect to an OpenCode
+service or make model requests. Review the image before committing it. The capture
+script rejects visible URLs/email addresses/user-directory paths and embedded
+PNG text or EXIF metadata; these checks complement, rather than replace, visual review.
 
 The build produces the prebuilt server, RPC contract, desktop GUI, component inventories,
 and third-party notices. All installable artifacts are committed; all npm dependencies

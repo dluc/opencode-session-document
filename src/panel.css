@@ -47,6 +47,7 @@
 .sd-diagram-canvas { display: flex; align-items: center; justify-content: center; width: max-content; min-width: 100%; min-height: 100%; }
 .sd-diagram svg { display: block; flex-shrink: 0; max-width: none; }
 .sd-diagram svg text { fill: #252e29; font: 13px ui-monospace, monospace; }
+.sd-diagram svg[aria-roledescription^="flowchart"] :is(.node, .edgeLabel, .cluster-label) text { text-anchor: middle; }
 .sd-diagram svg tspan { fill: #252e29; }
 .sd-diagram svg :is(rect, circle, ellipse, polygon) { fill: #edf2eb; stroke: #66776c; stroke-width: 1px; }
 .sd-diagram svg path { stroke: #66776c; stroke-width: 1px; fill: none; }

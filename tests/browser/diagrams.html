@@ -37,6 +37,16 @@
             const box = node.getBoundingClientRect()
             return box.height > 0 && box.top >= viewportBounds.top - 2 && box.bottom <= viewportBounds.bottom + 2
           })
+          const labelChecks = [...image.querySelectorAll('g.node')].flatMap(node => {
+            const label = node.querySelector('text')
+            const shape = node.querySelector('rect')
+            if (!label || !shape) return []
+            const textBox = label.getBoundingClientRect()
+            const shapeBox = shape.getBoundingClientRect()
+            return [textBox.left >= shapeBox.left - 2 && textBox.right <= shapeBox.right + 2]
+          })
+          const requiresNodeChecks = test.name === 'tall flowchart' || test.name === 'subgraphs and edge labels'
+          const nodeLabelsAligned = labelChecks.every(Boolean) && (!requiresNodeChecks || labelChecks.length > 0)
           const initialHeight = viewport.clientHeight
           const initialWidth = imageBounds.width
           diagram.querySelector('[aria-label="Zoom in diagram"]').click()
@@ -57,12 +67,12 @@
             name: test.name, labelsPresent: test.labels.every(label => text.includes(label)),
             svgTextLabels: image.querySelectorAll('text').length,
             htmlLabels: image.querySelectorAll('foreignObject').length,
-            visibleLabels, diagramHeight: diagram.getBoundingClientRect().height,
+            visibleLabels, nodeLabelsAligned, nodeLabelsChecked: labelChecks.length, diagramHeight: diagram.getBoundingClientRect().height,
             fitWithinViewport: imageBounds.height <= viewportBounds.height + 1 && imageBounds.width <= viewportBounds.width + 1,
             zoomWorks, expandWorks, fitWorks, resizeWorks,
             initialWidth, zoomWidth,
           }
-          result.passed = result.labelsPresent && result.visibleLabels && !result.htmlLabels && result.diagramHeight <= 450 && result.fitWithinViewport && zoomWorks && expandWorks && fitWorks && resizeWorks
+          result.passed = result.labelsPresent && result.visibleLabels && nodeLabelsAligned && !result.htmlLabels && result.diagramHeight <= 450 && result.fitWithinViewport && zoomWorks && expandWorks && fitWorks && resizeWorks
           results.push(result)
         }
         return { cases: results, passed: results.every(result => result.passed) }
